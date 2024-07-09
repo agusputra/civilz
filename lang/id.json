@@ -1,0 +1,24 @@
+{
+    "family.nav": "Keluarga",
+    "family.page.label" : "Keluarga",
+    "family.page.table.parents": "Orang tua",
+    "family.page.table.children-count": "Jumlah anak",
+    "family.page.table.others-count": "Jumlah lainnya",
+    "family.page.form.address": "Alamat",
+    "family.page.form.expenses": "Pengeluaran",
+    "family.page.form.distance-to-mosque": "Jarak ke Masjid",
+    "family.page.form.prayer-frequency": "Seberapa sering ke Masjid",
+
+    "resident.nav": "Penduduk",
+    "resident.page.label": "Penduduk",
+    "resident.page.table.name": "Nama",
+    "resident.page.table.role": "Peran",
+    "resident.page.table.gender": "Kelamin",
+    "resident.page.form.role": "Peran",
+
+    "asset.nav": "Aset",
+    "asset.page.label": "Aset",
+
+
+    "foo": "BAR baz"
+}
