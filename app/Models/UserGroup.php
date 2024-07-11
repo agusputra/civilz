@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Enums\FamilyRole;
 use App\Support\HasMeta;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,7 +47,7 @@ class UserGroup extends Pivot
 
     public function role(): Attribute
     {
-        return $this->createAttributeInMeta('role');
+        return $this->createAttributeInMeta('role', fn ($value) => FamilyRole::tryFrom($value));
     }
 
     //endregion

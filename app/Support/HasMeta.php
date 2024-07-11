@@ -4,7 +4,6 @@ namespace App\Support;
 
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Casts\Json;
 
 /**
  * CAUTION:
@@ -19,38 +18,59 @@ use Illuminate\Database\Eloquent\Casts\Json;
  */
 trait HasMeta
 {
+    // private ?ArrayObject $metastore = null;
+
     public function initializeHasMeta()
     {
         // This meta field should be hidden in the model.
         // The meta attribute is a way to utilize json field as a store to make dynamic attributes in the model without creating the field in db.
         $this->hidden[] = 'meta';
 
-        // Do we need this? Seems not working.
-        // For model that is already exists in db and the meta field is null in db, when we do $someModel->meta['someField'] = 'value',
-        // then it's not set the meta field in db.
-        $this->attributes['meta'] = '{}';
-
         $this->casts['meta'] = AsArrayObject::class;
     }
 
-    public function createAttributeInMeta($name = null): ?Attribute
+    public function createAttributeInMeta($name = null, callable $getter = null, callable $setter = null): ?Attribute
     {
+        // // TODO: With this we have multiple sources of data.
+        // if (is_null($this->metastore)) {
+        //     $meta = $this->attributes['meta'] ?? '{}';
+        //     $meta = json_decode($meta, true);
+
+        //     $this->metastore = new ArrayObject($meta);
+        // }
+
         if (empty($name)) {
             return new Attribute();
         }
 
         return Attribute::make(
-            get: function () use ($name) {
-                return $this->meta[$name] ?? null;
-            },
-            set: function ($value) use ($name) {
-                if (empty($this->meta)) {
-                    $this->meta = [];
+            get: function (mixed $value, array $attrs) use ($name, $getter) {
+                // $value = $this->metastore[$name] ?? null;
+
+                $meta = $attrs['meta'] ?? '{}';
+                $meta = json_decode($meta, true);
+                $value = $meta[$name] ?? null;
+
+                if (is_callable($getter)) {
+                    $value = $getter($value);
                 }
 
-                $this->meta[$name] = $value;
+                return $value;
+            },
+            set: function (mixed $value, array $attrs) use ($name, $setter) {
+                if (is_callable($setter)) {
+                    $value = $setter($value);
+                }
 
-                return ['meta' => json_encode($this->meta)];
+                // $this->metastore[$name] = $value;
+
+                $meta = $attrs['meta'] ?? '{}';
+                $meta = json_decode($meta, true);
+                $meta[$name] = $value;
+
+                // return ['meta' => json_encode($this->metastore)];
+
+                return ['meta' => json_encode($meta)];
             }
         );
     }

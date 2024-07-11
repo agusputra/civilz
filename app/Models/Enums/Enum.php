@@ -6,15 +6,17 @@ use Illuminate\Support\Str;
 
 trait Enum
 {
-    public function getNameI18n(): string
+    public function getNameT(): string
     {
-        return Str::title($this->name);
+        $name = __('models.enums.'.Str::lower(class_basename(static::class)).'.'.$this->value);
+
+        return $name;
     }
 
     public static function toOptions(): array
     {
         foreach (self::cases() as $case) {
-            $options[$case->value] = $case->getNameI18n();
+            $options[$case->value] = $case->getNameT();
         }
 
         return $options;

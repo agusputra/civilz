@@ -2,7 +2,7 @@
 
 namespace App\Models\Enums;
 
-enum GroupRole: string
+enum FamilyRole: string
 {
     use Enum;
 

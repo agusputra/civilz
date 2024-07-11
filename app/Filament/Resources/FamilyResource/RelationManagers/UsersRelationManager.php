@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\GroupResource\RelationManagers;
+namespace App\Filament\Resources\FamilyResource\RelationManagers;
 
 use App\Models\Enums\EducationLevel;
+use App\Models\Enums\FamilyRole;
 use App\Models\Enums\Gender;
-use App\Models\Enums\GroupRole;
 use App\Models\Enums\MaritalStatus;
 use App\Models\User;
 use App\Models\UserGroup;
@@ -28,14 +28,17 @@ class UsersRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('resident.page.label', ['name' => $ownerRecord->name]);
+        return __('admin.resident.page.label', ['name' => $ownerRecord->name]);
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->required()->autocomplete(false),
+                Forms\Components\TextInput::make('name')
+                    ->label(__('admin.resident.page.form.name'))
+                    ->required()
+                    ->autocomplete(false),
                 Forms\Components\Hidden::make('email')
                     ->required()
                     ->afterStateHydrated(function (Component $component, ?string $state, string $operation): void {
@@ -57,7 +60,8 @@ class UsersRelationManager extends RelationManager
                     ->dehydrated(fn (?string $state): bool => filled($state))
                     ->required(fn (string $operation): bool => $operation === 'create'),
                 Forms\Components\Select::make('meta.role')
-                    ->options(GroupRole::toOptions())
+                    ->label(__('admin.resident.page.form.role'))
+                    ->options(FamilyRole::toOptions())
                     ->required()
                     ->afterStateHydrated(function (Component $component, ?string $state, User $user, $livewire) {
                         $group = $livewire->getOwnerRecord();
@@ -71,10 +75,10 @@ class UsersRelationManager extends RelationManager
                     })
                     ->afterStateUpdated(function (Component $component, ?string $state, Get $get, Set $set) {
                         $role = $get('meta.role');
-                        $role = GroupRole::tryFrom($role);
-                        $gender = $role === GroupRole::HUSBAND
+                        $role = FamilyRole::tryFrom($role);
+                        $gender = $role === FamilyRole::HUSBAND
                             ? Gender::MALE
-                            : ($role === GroupRole::WIFE ? Gender::FEMALE : null);
+                            : ($role === FamilyRole::WIFE ? Gender::FEMALE : null);
 
                         if ($gender) {
                             $set('gender', $gender->value);
@@ -82,16 +86,19 @@ class UsersRelationManager extends RelationManager
                     })
                     ->live(),
                 Forms\Components\Select::make('gender')
+                    ->label(__('admin.resident.page.form.gender'))
                     ->options(Gender::toOptions()),
                 Forms\Components\Select::make('marital_status')
-                    ->options(MaritalStatus::toOptions())
-                    ->disabled(function (Component $component, ?string $state, Get $get) {
-                        $role = $get('meta.role');
-                        $role = GroupRole::tryFrom($role);
+                    ->label(__('admin.resident.page.form.marital_status'))
+                    ->options(MaritalStatus::toOptions()),
+                    // ->disabled(function (Component $component, ?string $state, Get $get) {
+                    //     $role = $get('meta.role');
+                    //     $role = FamilyRole::tryFrom($role);
 
-                        return $role ? $role !== GroupRole::HUSBAND && $role !== GroupRole::WIFE : true;
-                    }),
+                    //     return $role ? $role !== FamilyRole::HUSBAND && $role !== FamilyRole::WIFE : true;
+                    // }),
                 Forms\Components\TextInput::make('age')
+                    ->label(__('admin.resident.page.form.age'))
                     ->live(onBlur: true)
                     ->numeric()
                     ->integer(true)
@@ -107,6 +114,7 @@ class UsersRelationManager extends RelationManager
                         }
                     }),
                 Forms\Components\DatePicker::make('dob')
+                    ->label(__('admin.resident.page.form.dob'))
                     ->live(onBlur: true, debounce: 800)
                     // Using native(false) is buggy. When the component->live(), the datepicker value increases by 1 day per second.
                     // ->native(false)
@@ -128,11 +136,15 @@ class UsersRelationManager extends RelationManager
                             $set('age', $age);
                         }
                     }),
-                Forms\Components\TextInput::make('phone_number'),
+                Forms\Components\TextInput::make('phone')
+                    ->label(__('admin.resident.page.form.phone')),
                 Forms\Components\Select::make('education')
+                    ->label(__('admin.resident.page.form.education'))
                     ->options(EducationLevel::toOptions()),
-                Forms\Components\TextInput::make('occupation'),
+                Forms\Components\TextInput::make('occupation')
+                    ->label(__('admin.resident.page.form.occupation')),
                 Forms\Components\TextInput::make('income')
+                    ->label(__('admin.resident.page.form.income'))
                     ->numeric()
                     ->integer()
                     ->prefix('Rp'),
@@ -179,16 +191,22 @@ class UsersRelationManager extends RelationManager
                 //     ->checkFileExistence(false)
                 //     ->circular(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('resident.page.table.name'))
+                    ->label(__('admin.resident.page.table.name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('role')
-                    ->label(__('resident.page.table.role'))
+                    ->label(__('admin.resident.page.table.role'))
                     ->state(function (User $user): string {
-                        return $user->pivot->meta ? $user->pivot->meta['role'] ?? '' : '';
+                        $value = $user->pivot->meta ? $user->pivot->meta['role'] ?? '' : '';
+                        $value = FamilyRole::tryFrom($value);
+
+                        return $value ? __($value->getNameT()) : '';
                     }),
                 Tables\Columns\TextColumn::make('gender')
-                    ->label(__('resident.page.table.gender')),
+                    ->label(__('admin.resident.page.table.gender'))
+                    ->state(function (User $user): string {
+                        return $user->gender ? __($user->gender->getNameT()) : '';
+                    }),
                 // Tables\Columns\TextColumn::make('tmp'),
                 // Tables\Columns\TextColumn::make('tmp_json'),
                 Tables\Columns\TextColumn::make('created_at')

@@ -4,7 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Models\Enums\GroupRole;
+use App\Models\Enums\EducationLevel;
+use App\Models\Enums\FamilyRole;
+use App\Models\Enums\Gender;
+use App\Models\Enums\MaritalStatus;
 use App\Support\HasMeta;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Models\Contracts\FilamentUser;
@@ -40,7 +43,7 @@ class User extends Authenticatable implements FilamentUser
         'gender',
         'dob',
         'occupation',
-        'phone_number',
+        'phone',
         'education',
         'marital_status',
         'income',
@@ -60,7 +63,7 @@ class User extends Authenticatable implements FilamentUser
         'gender',
         'dob',
         'occupation',
-        'phone_number',
+        'phone',
         'education',
         'marital_status',
         'income',
@@ -97,8 +100,8 @@ class User extends Authenticatable implements FilamentUser
     {
         return $query->whereHas('groups', function ($query) {
             $query
-                ->whereJsonContains('user_group.meta->role', GroupRole::HUSBAND)
-                ->orWhereJsonContains('user_group.meta->role', GroupRole::WIFE);
+                ->whereJsonContains('user_group.meta->role', FamilyRole::HUSBAND)
+                ->orWhereJsonContains('user_group.meta->role', FamilyRole::WIFE);
         });
     }
 
@@ -108,7 +111,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function gender(): Attribute
     {
-        return $this->createAttributeInMeta('gender');
+        return $this->createAttributeInMeta('gender', fn ($value) => Gender::tryFrom($value));
     }
 
     public function dob(): Attribute
@@ -121,19 +124,19 @@ class User extends Authenticatable implements FilamentUser
         return $this->createAttributeInMeta('occupation');
     }
 
-    public function phoneNumber(): Attribute
+    public function phone(): Attribute
     {
-        return $this->createAttributeInMeta('phone_number');
+        return $this->createAttributeInMeta('phone');
     }
 
     public function education(): Attribute
     {
-        return $this->createAttributeInMeta('education');
+        return $this->createAttributeInMeta('education', fn ($value) => EducationLevel::tryFrom($value));
     }
 
     public function maritalStatus(): Attribute
     {
-        return $this->createAttributeInMeta('marital_status');
+        return $this->createAttributeInMeta('marital_status', fn ($value) => MaritalStatus::tryFrom($value));
     }
 
     public function income(): Attribute

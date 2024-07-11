@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Enums\GroupRole;
+use App\Models\Enums\FamilyRole;
 use App\Support\HasMeta;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,20 +43,20 @@ class Group extends Model
     public function parents(): BelongsToMany
     {
         return $this->users()
-            ->wherePivot('meta->role', GroupRole::HUSBAND->value)
-            ->orWherePivot('meta->role', GroupRole::WIFE->value);
+            ->wherePivot('meta->role', FamilyRole::HUSBAND->value)
+            ->orWherePivot('meta->role', FamilyRole::WIFE->value);
     }
 
     public function children(): BelongsToMany
     {
         return $this->users()
-            ->wherePivot('meta->role', GroupRole::CHILD->value);
+            ->wherePivot('meta->role', FamilyRole::CHILD->value);
     }
 
     public function others(): BelongsToMany
     {
         return $this->users()
-            ->wherePivot('meta->role', GroupRole::OTHER->value);
+            ->wherePivot('meta->role', FamilyRole::OTHER->value);
     }
 
     public function assets()

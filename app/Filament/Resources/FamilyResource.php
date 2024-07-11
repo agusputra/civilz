@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\GroupResource\Pages;
-use App\Filament\Resources\GroupResource\RelationManagers;
+use App\Filament\Resources\FamilyResource\Pages;
+use App\Filament\Resources\FamilyResource\RelationManagers;
 use App\Models\Group;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
@@ -14,7 +14,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class GroupResource extends Resource implements HasShieldPermissions
+class FamilyResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Group::class;
 
@@ -28,12 +28,12 @@ class GroupResource extends Resource implements HasShieldPermissions
 
     public static function getNavigationLabel(): string
     {
-        return __('family.nav');
+        return __('admin.family.nav');
     }
 
     public static function getModelLabel(): string
     {
-        return __('family.page.label');
+        return __('admin.family.page.label');
     }
 
     public static function form(Form $form): Form
@@ -41,19 +41,19 @@ class GroupResource extends Resource implements HasShieldPermissions
         return $form
             ->schema([
                 Forms\Components\Textarea::make('address')
-                    ->label(__('family.page.form.address')),
+                    ->label(__('admin.family.page.form.address')),
                 Forms\Components\TextInput::make('expenses')
-                    ->label(__('family.page.form.expenses'))
+                    ->label(__('admin.family.page.form.expenses'))
                     ->numeric()
                     ->integer()
                     ->prefix('Rp'),
                 Forms\Components\TextInput::make('distance_to_mosque')
-                    ->label(__('family.page.form.distance-to-mosque'))
+                    ->label(__('admin.family.page.form.distance_to_mosque'))
                     ->numeric()
                     ->integer()
                     ->suffix('meter(s)'),
                 Forms\Components\TextInput::make('prayer_frequency')
-                    ->label(__('family.page.form.prayer-frequency'))
+                    ->label(__('admin.family.page.form.prayer_frequency'))
                     ->numeric()
                     ->integer()
                     ->suffix('per / hari'),
@@ -67,13 +67,13 @@ class GroupResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('parents.name')
-                    ->label(__('family.page.table.parents')),
+                    ->label(__('admin.family.page.table.parents')),
                 Tables\Columns\TextColumn::make('children_count')->counts('children')
                     ->sortable()
-                    ->label(__('family.page.table.children-count')),
+                    ->label(__('admin.family.page.table.children_count')),
                 Tables\Columns\TextColumn::make('others_count')->counts('others')
                     ->sortable()
-                    ->label(__('family.page.table.others-count')),
+                    ->label(__('admin.family.page.table.others_count')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -121,9 +121,9 @@ class GroupResource extends Resource implements HasShieldPermissions
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListGroups::route('/'),
-            'create' => Pages\CreateGroup::route('/create'),
-            'edit' => Pages\EditGroup::route('/{record}/edit'),
+            'index' => Pages\ListFamilies::route('/'),
+            'create' => Pages\CreateFamily::route('/create'),
+            'edit' => Pages\EditFamily::route('/{record}/edit'),
         ];
     }
 

@@ -6,8 +6,8 @@ enum PropertyLevel: string
 {
     use Enum;
 
-    case LEVEL1 = 'Level 1';
-    case LEVEL2 = 'Level 2';
-    case LEVEL3 = 'Level 3';
-    case LEVEL4 = 'Level 4';
+    case LEVEL1 = 'level1';
+    case LEVEL2 = 'level2';
+    case LEVEL3 = 'level3';
+    case LEVEL4 = 'level4';
 }
